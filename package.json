@@ -1,0 +1,26 @@
+{
+  "name": "chrxmee-mp4-bot-maker",
+  "version": "1.0.0",
+  "description": "Build bots for Chrxmee-MP4 — the offbrand Netflix × YouTube platform. Create custom bots with slash commands, message responses, and guild integration.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test.js"
+  },
+  "keywords": [
+    "chrxmee-mp4",
+    "bot",
+    "bot-maker",
+    "discord-bot",
+    "video-platform",
+    "slash-commands",
+    "guilds"
+  ],
+  "author": "Chrxmee",
+  "license": "MIT",
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Chrxmee/chrxmee-mp4-bot-maker"
+  }
+}
