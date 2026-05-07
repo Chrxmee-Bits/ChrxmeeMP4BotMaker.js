@@ -1,6 +1,6 @@
 {
   "name": "chrxmee-mp4-bot-maker",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Build bots for Chrxmee-MP4 — the offbrand Netflix × YouTube platform.",
   "main": "bot-maker.js",
   "scripts": {
