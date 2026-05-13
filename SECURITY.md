@@ -22,6 +22,6 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security issue, do not open a public issue. Contact `chrxmee@proton.me` with details. Response within 48 hours. 
+If you discover a security issue, do not open a public issue. Contact `chrxmaticc@proton.me` with details. Response within 48 hours. 
 
 This package has zero dependencies. Vulnerabilities can only exist in the package itself.
