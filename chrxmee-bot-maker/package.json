@@ -1,22 +1,18 @@
-1{
-2  "name": "chrxmee-mp4-bot-maker",
-3  "version": "1.2.1",
-4  "description": "Build bots for Chrxmee-MP4 — the offbrand Netflix × YouTube platform.",
-5  "main": "bot-maker.js",
-6  "scripts": {
-7    "start": "node bot-maker.js",
-8    "test": "echo \"✅ All tests passed! (there are no tests lol)\" && exit 0"
-9  },
-10  "keywords": [
-11    "chrxmee-mp4",
-12    "bot",
-13    "bot-maker",
-14    "video-platform",
-15    "slash-commands",
-16    "guilds"
-17  ],
-18  "author": "Chrxmee",
-19  "license": "MIT",
-20  "dependencies": {}
-21}
-22
+{
+  "name": "chrxmee-mp4-bot-maker",
+  "version": "1.2.1",
+  "description": "Bot framework for Chrxmee-MP4",
+  "main": "bot-maker.js",
+  "scripts": {
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "keywords": [
+    "chrxmee-mp4",
+    "bot",
+    "bot-maker",
+    "guilds",
+    "slash-commands"
+  ],
+  "author": "Chrxmee",
+  "license": "MIT"
+}
