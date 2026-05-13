@@ -2,7 +2,7 @@
   "name": "chrxmee-mp4-bot-maker",
   "version": "1.6.3",
   "description": "Bot framework for Chrxmee-MP4",
-  "main": "bot-maker.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"No tests yet\" && exit 0"
   },
@@ -13,6 +13,10 @@
     "guilds",
     "slash-commands"
   ],
-  "author": "Chrxmee",
-  "license": "MIT"
+  "author": "Chrxmee-Midnightt",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Chrxmee-Bits/ChrxmeeMP4BotMaker.js.git"
+  }
 }
