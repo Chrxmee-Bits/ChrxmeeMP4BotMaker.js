@@ -4,7 +4,6 @@ const Plugin = require('../structures/Plugin');
 class PluginManager extends BaseManager {
     constructor(client) {
         super(client);
-        this.installed = new Set();
     }
 
     _createInstance(data) {
@@ -12,30 +11,28 @@ class PluginManager extends BaseManager {
     }
 
     async fetchAll() {
-        const marketplace = this.client._getPluginMarketplace();
+        const marketplace = this.client.storage.getPluginMarketplace();
         const approved = marketplace.filter(p => p.status !== 'rejected');
-        const defaultPlugins = this.client._getDefaultPlugins();
-        const all = [...defaultPlugins, ...approved];
-        all.forEach(p => this.add(p));
-        return this;
-    }
+        const installed = this.client.storage.getInstalledPlugins();
 
-    async fetchInstalled() {
-        const installedIds = this.client._getInstalledPlugins();
-        const all = await this.fetchAll();
-        for (const id of installedIds) {
-            const plugin = this.get(id);
-            if (plugin) plugin.installed = true;
-            this.installed.add(id);
-        }
-        return [...this.installed].map(id => this.get(id)).filter(Boolean);
+        // Load default plugins
+        const defaults = this.client.Constants.DEFAULT_PLUGINS || [];
+        defaults.forEach(p => {
+            this.add({ ...p, status: 'approved', installed: installed.includes(p.id) });
+        });
+
+        // Load marketplace plugins
+        approved.forEach(p => {
+            this.add({ ...p, installed: installed.includes(p.id) });
+        });
+
+        return this;
     }
 
     async install(id) {
         const plugin = this.get(id);
         if (!plugin) throw new Error(`Plugin ${id} not found`);
         await plugin.install();
-        this.installed.add(id);
         return plugin;
     }
 
@@ -43,8 +40,15 @@ class PluginManager extends BaseManager {
         const plugin = this.get(id);
         if (!plugin) throw new Error(`Plugin ${id} not found`);
         await plugin.uninstall();
-        this.installed.delete(id);
         return plugin;
+    }
+
+    get installed() {
+        return [...this.values()].filter(p => p.isInstalled);
+    }
+
+    get available() {
+        return [...this.values()].filter(p => !p.isInstalled);
     }
 }
 
