@@ -22,32 +22,22 @@ class VoiceChannel extends GuildChannel {
         this.dj = new DJManager(client, this, vcData);
     }
 
-    get participants() {
-        return this.voiceState.participants;
-    }
+    get participants() { return this.voiceState.participants; }
+    get currentDJ() { return this.dj.current; }
+    get isPlaying() { return this.voiceState.isPlaying; }
+    get currentVideo() { return this.voiceState.currentVideo; }
+    get participantCount() { return this.voiceState.participants.length; }
 
-    get currentDJ() {
-        return this.dj.current;
-    }
-
-    get isPlaying() {
-        return this.voiceState.isPlaying;
-    }
-
-    get currentVideo() {
-        return this.voiceState.currentVideo;
-    }
-
-    // ---- VC Actions ----
     async join() {
         if (this.voiceState.hasParticipant(this.client.user.id)) {
-            throw new VoiceError('Already in voice channel');
+            throw new VoiceError('Already connected to this voice channel.');
         }
         this.voiceState.addParticipant(this.client.user.id);
         if (!this.voiceState.currentDJ) {
             this.dj.assign(this.client.user.id);
         }
-        await this._save();
+        this.client.emit('voiceJoin', this, this.client.user);
+        return this._save();
     }
 
     async leave() {
@@ -58,73 +48,75 @@ class VoiceChannel extends GuildChannel {
         if (this.voiceState.participants.length === 0) {
             this.voiceState.stopPlayback();
         }
-        await this._save();
+        this.client.emit('voiceLeave', this, this.client.user);
+        return this._save();
     }
 
     async play(video) {
-        if (this.currentDJ?.id !== this.client.user.id) {
-            throw new VoiceError('Only the DJ can play videos');
+        if (!this.currentDJ || this.currentDJ.id !== this.client.user.id) {
+            throw new VoiceError('Only the DJ can play videos.');
         }
-        this.queue.add(video);
+        const entry = this.queue.add(video);
         if (!this.isPlaying) {
             this.queue.playNext();
         }
-        await this._save();
+        return entry;
     }
 
     async skip() {
-        if (this.currentDJ?.id !== this.client.user.id) {
-            throw new VoiceError('Only the DJ can skip');
+        if (!this.currentDJ || this.currentDJ.id !== this.client.user.id) {
+            throw new VoiceError('Only the DJ can skip.');
         }
-        this.queue.playNext();
-        await this._save();
+        return this.queue.playNext();
     }
 
     async pause() {
-        if (this.currentDJ?.id !== this.client.user.id) {
-            throw new VoiceError('Only the DJ can pause');
+        if (!this.currentDJ || this.currentDJ.id !== this.client.user.id) {
+            throw new VoiceError('Only the DJ can pause.');
         }
         this.voiceState.pause();
-        await this._save();
+        return this._save();
     }
 
     async resume() {
-        if (this.currentDJ?.id !== this.client.user.id) {
-            throw new VoiceError('Only the DJ can resume');
+        if (!this.currentDJ || this.currentDJ.id !== this.client.user.id) {
+            throw new VoiceError('Only the DJ can resume.');
         }
         this.voiceState.resume();
-        await this._save();
+        return this._save();
     }
 
     async seek(seconds) {
-        if (this.currentDJ?.id !== this.client.user.id) {
-            throw new VoiceError('Only the DJ can seek');
+        if (!this.currentDJ || this.currentDJ.id !== this.client.user.id) {
+            throw new VoiceError('Only the DJ can seek.');
         }
         this.voiceState.seek(seconds);
-        await this._save();
+        return this._save();
     }
 
     async setDJ(username) {
         if (!this.voiceState.hasParticipant(username)) {
-            throw new VoiceError('User is not in the voice channel');
+            throw new VoiceError('That user is not in the voice channel.');
         }
+        const oldDJ = this.voiceState.currentDJ;
         this.dj.assign(username);
-        await this._save();
+        this.client.emit('voiceDJChange', this, oldDJ, username);
+        return this._save();
     }
 
     async _save() {
-        const guilds = this.client._getGuilds();
+        const guilds = this.client.storage.getGuilds();
         const guild = guilds.find(g => g.id === this.guild.id);
-        if (guild) {
-            for (const cat of (guild.categories || [])) {
-                const ch = (cat.channels || []).find(c => c.id === this.id);
-                if (ch) {
-                    ch.vcState = this.voiceState.toJSON();
-                    this.client._saveGuilds(guilds);
-                    return;
-                }
+        if (!guild) return this;
+        for (const cat of (guild.categories || [])) {
+            const ch = (cat.channels || []).find(c => c.id === this.id);
+            if (ch) {
+                ch.vcState = this.voiceState.toJSON();
+                this.client.storage.saveGuilds(guilds);
+                return this;
             }
         }
+        return this;
     }
 }
 
